@@ -8,17 +8,52 @@ File: app.js
 */
 
 const readlineSync = require("readline-sync");
-// const questions = require("./data/questions");
 const fs = require("fs")
-const util = require("util")
-
-util.promisify()
-
 const text = readlineSync.question("Give me some text!")
-
-fs.writeFile("./newText.txt", text, (contents) => {
-console.log(contents)
+fs.writeFile("./inputText.txt", text, (contents) => {
 });
+
+class Line {
+ /**
+  * 
+  * @param {string} text the string to use as line.
+  * @param {number} lineNum the line number of the string.
+  */
+  constructor(text, lineNum) {
+    this.text = text
+    this.lineNum = lineNum
+    this.size = this.getTextLength(text)
+  }
+
+  /**
+   * 
+   * @param {number} num a number
+   * @description returns true if more then number provided. 
+   */
+  isMoreThen(num) {
+   return this.text.length > num ? true : false
+  }
+
+    /**
+   * 
+   * @param {number} num a number
+   * @description returns true if less then number provided. 
+   */
+
+  isLessThen(num) {
+    return this.text.length <= num ? true : false
+  }
+
+  getTextLength() {
+    return this.text.length
+  }
+}
+
+/**
+ * 
+ * @param {string} filePath the file path location of the text file.
+ * @param {function} func a calback function to handle the text.
+ */
 
 const processTextFile = (filePath, func) => {
   fs.readFile(filePath, "utf8", (err, contents) => {
@@ -30,89 +65,99 @@ const processTextFile = (filePath, func) => {
   });
 }
 
+/**
+ * 
+ * @param {string} text a string containing new line spacing. 
+ */
+
 const convertToArr = (text) => {
-  return text.split(" ")
+  return text.split("\n")
 }
 
-const convertToUpperCase = () => {
+/**
+ * 
+ * @param {array} textArr an array of strings.
+ * @description adds a number to the begining of each string in array.  
+ */
 
-}
-
-const addLineNumbers = () => {
-
-}
-
-const ommitLine = () => {
-
-}
-
-// processTextFile("bacon.txt", (contents) => {
-//   let textArr = convertToArr(contents)
-
-
-// })
-
-// log an input error to console
-const logInputErr =(err) => {
-  console.log(`\n\n${chalk.red(err)}`);
-}
-
-// function validate anwser type
-const validateType = (anwser, expectType) => {
-  if (expectType === "number") {
-    return isNaN(anwser);
+const addLineNumbers = (textArr) => {
+  let linesContainer = []
+  let i 
+  for(i = 0; i < textArr.length; i++) {
+    let line = new Line(textArr[i], i + 1)
+    linesContainer.push(line)
   }
-
-  if (expectType === "string") {
-    return isNaN(anwser.match(/(\d+)/));
-  }
-};
+  return linesContainer
+}
 
 
+/**
+ * 
+ * @param {array} lineContainer a array of line class objects.
+ * @param {number} num the desired length of each string to be converted.
+ */
 
+const convertToUpperCase = (lineContainer, num) => {
+  let newLineContainer = lineContainer.map(line => {
+    if(line.isLessThen(num)) {
+      let newText = line.text.toUpperCase()
+      line.text = newText
+      return line
+    }
+    return line
+  })
+  return newLineContainer
+}
 
-// /**
-//  *   @param {object} question a single question 
-//  */
-// // function - ask question
-// const askQuestion = (question) => {
-//   let anwser = readlineSync.question(question.name);
-//   if(anwser.toLocaleLowerCase() === "quit") {
-//     console.clear()
-//     process.exit()
-//   }
-//   return anwser;
-// };
+/**
+ * 
+ * @param {array} lineContainer a array of line class objects.
+ * @param {number} num the desired length of each string to be converted.
+ */
 
-// /**
-//  *   @param {array} questions Array of questions
-//  */
+const convertToLowerCase = (lineContainer, num) => {
+  let newLineContainer = lineContainer.map(line => {
+    if(line.isMoreThen(num)) {
+      let newText = line.text.toLowerCase()
+      line.text = newText
+      return line
+    }
+    return line
+  })
+  return newLineContainer
+}
 
-// // function ask a set of questions
-// const askQuestions = (questions, func) => {
-//   let anwsers = {}
-//   questions.forEach((q) => {
-//     let anwser = askQuestion(q);
-   
-//     // check if no anwser was provided
-//    while(anwser === "") {
-//     logInputErr("0 is not an anwser!")
-//     anwser = askQuestion(q)
-//    }
+/**
+ * 
+ * @param {array} lineContaier a array of line class objects.
+ * @description Picks a random index of the line container and removes it from it.
+ */
 
-//     // check if string was provided
-//    if(q.type === "string")
-//    while(validateType(anwser, "string")) {
-//      logInputErr("That is not an string!")
-//     anwser = askQuestion(q)
-//    }
- 
-//    anwsers[q.propName] = anwser
-//   });
-//   func(anwsers);
-//   askQuestions(questions, logResults)
-// };
+const ommitRandom = (lineContaier) => {
+  let randomIndex = Math.floor(Math.random() * lineContaier.length)
+  let newLineContainer = lineContaier.filter((line, index) => {
+    return index !== randomIndex
+  })
+  return newLineContainer
+}
 
+const logText = (lineContaier) => {
+  console.log("\n==========================================\nAltered Text\n==========================================")
+  lineContaier.forEach(line => {
+    console.log(`${line.lineNum}: ${line.text}`)
+  })
+  console.log("\n")
+}
 
-// // log output to console
-// askQuestions(questions, logResults)
+// log output
+processTextFile("bacon.txt", (contents) => {
+  let newLineContainer, oldText
+  oldText = contents 
+  let textArr = convertToArr(contents)
+  newLineContainer = addLineNumbers(textArr)
+  newLineContainer = convertToUpperCase(newLineContainer, 20)
+  newLineContainer = convertToLowerCase(newLineContainer, 20)
+  newLineContainer = ommitRandom(newLineContainer)
+  console.log("==========================================\nOriginal Text\n==========================================\n" + oldText)
+  logText(newLineContainer)
+})

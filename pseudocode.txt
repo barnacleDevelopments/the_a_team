@@ -1,0 +1,10 @@
+PSEUDOCODE:
+- Create function that CONVERTS a string into an array
+    stringArr = text.split("\n")
+- Create function that ADDS line numbers to strings 
+    stringArr loop and add number to begining of each string
+- Create function that CONVERTS strings to uppercase
+    stringLine.toUpperCase()
+- Create function that OMMITS a string
+   length of stringArray =>  Math.random => remove
+ 
