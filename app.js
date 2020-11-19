@@ -9,9 +9,6 @@ File: app.js
 
 const readlineSync = require("readline-sync");
 const fs = require("fs")
-const text = readlineSync.question("Give me some text!")
-fs.writeFile("./inputText.txt", text, (contents) => {
-});
 
 class Line {
  /**
